@@ -14,7 +14,6 @@ import frc.robot.commands.*;
 /** Add your docs here. */
 public class OI {
     private static final XboxController driverController = new XboxController(0);
-    private static final XboxController manipulatorController = new XboxController(1);
 
     public OI() {
         // intake = new Intake();
