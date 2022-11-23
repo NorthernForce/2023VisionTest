@@ -5,9 +5,11 @@
 package frc.robot;
 
 import frc.robot.commands.DriveWithJoystick;
+import frc.robot.commands.auto.FollowTarget;
 import frc.robot.commands.auto.TurnToTarget;
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -20,11 +22,14 @@ public class RobotContainer {
   public static final Drivetrain drivetrain = new Drivetrain();
 
   private final OI oi = new OI();
+  public static final Dashboard dashboard = new Dashboard();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     initDefaultCommands();
     oi.bindButtons();
+    dashboard.clearDashboard();
+    dashboard.displayCommands(new TurnToTarget(), new FollowTarget(4), new InstantCommand());
   }
 
   /**
@@ -34,7 +39,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new TurnToTarget();
+    return dashboard.getSelection();
   }
 
   private void initDefaultCommands() {
