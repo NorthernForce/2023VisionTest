@@ -64,6 +64,7 @@ public class FollowTarget extends CommandBase {
         Units.degreesToRadians(result.getBestTarget().getPitch()));
       rotate = controller.calculate(result.getBestTarget().getYaw(), 0);
       xSpeed = xController.calculate(range, distance);
+      dashboard.putNumber("Range", range);
     }
     drivetrain.drive(xSpeed, rotate);
   }
@@ -76,6 +77,7 @@ public class FollowTarget extends CommandBase {
     dashboard.delete("Rotate - kD");
     dashboard.delete("Drive - kP");
     dashboard.delete("Drive - kD");
+    dashboard.delete("Range");
   }
 
   // Returns true when the command should end.
