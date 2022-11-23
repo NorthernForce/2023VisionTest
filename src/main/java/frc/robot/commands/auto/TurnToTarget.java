@@ -28,6 +28,7 @@ public class TurnToTarget extends CommandBase {
   @Override
   public void initialize() {
     camera = new PhotonCamera("webcam");
+    camera.setPipelineIndex(1);
     controller = new PIDController(0.025, 0, 0);
     dashboard.putNumber("kP", 0.025);
     dashboard.putNumber("kD", 0);

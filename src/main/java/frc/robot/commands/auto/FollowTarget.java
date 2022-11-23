@@ -9,15 +9,11 @@ import static frc.robot.RobotContainer.drivetrain;
 import java.util.function.DoubleSupplier;
 
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import static frc.robot.Constants.CAMERA_PITCH_RADIANS;
-import static frc.robot.Constants.CAMERA_HEIGHT_METERS;
-import static frc.robot.Constants.TARGET_HEIGHT_METERS;
 import static frc.robot.RobotContainer.dashboard;
 
 public class FollowTarget extends CommandBase {
@@ -35,6 +31,7 @@ public class FollowTarget extends CommandBase {
   @Override
   public void initialize() {
     camera = new PhotonCamera("webcam");
+    camera.setPipelineIndex(1);
     controller = new PIDController(0.025, 0, 0);
     xController = new PIDController(0.07, 0, 0);
     dashboard.putNumber("Rotate - kP", 0.025);
@@ -59,9 +56,9 @@ public class FollowTarget extends CommandBase {
     xController.setD(driveD.getAsDouble());
     if (result.hasTargets())
     {
-      double range = PhotonUtils.calculateDistanceToTargetMeters(
-        CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, 
-        Units.degreesToRadians(result.getBestTarget().getPitch()));
+      Transform3d translation = result.getBestTarget().getBestCameraToTarget();
+      double range = Math.sqrt(Math.pow(translation.getX(), 2) + 
+        Math.pow(translation.getY(), 2));
       rotate = controller.calculate(result.getBestTarget().getYaw(), 0);
       xSpeed = xController.calculate(range, distance);
       dashboard.putNumber("Range", range);
