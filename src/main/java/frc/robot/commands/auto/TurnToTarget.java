@@ -7,15 +7,17 @@ package frc.robot.commands.auto;
 import static frc.robot.RobotContainer.drivetrain;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TurnToTarget extends CommandBase {
   /** Creates a new TurnToTarget. */
   private PhotonCamera camera;
-  private PIDController controller;
+  private PIDController controller, xController;
   public TurnToTarget() {
     addRequirements(drivetrain);
   }
@@ -24,7 +26,8 @@ public class TurnToTarget extends CommandBase {
   @Override
   public void initialize() {
     camera = new PhotonCamera("webcam");
-    controller = new PIDController(0.1, 0, 0);
+    controller = new PIDController(0.025, 0, 0);
+    xController = new PIDController(0.07, 0, 0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -32,11 +35,15 @@ public class TurnToTarget extends CommandBase {
   public void execute() {
     PhotonPipelineResult result = camera.getLatestResult();
     double rotate = 0;
+    double xSpeed = 0;
     if (result.hasTargets())
     {
-      rotate = controller.calculate(-result.getBestTarget().getYaw(), 0);
+      double range = PhotonUtils.calculateDistanceToTargetMeters(
+        0.245, 0.79, 0, result.getBestTarget().getPitch());
+      rotate = controller.calculate(result.getBestTarget().getYaw(), 0);
+      xSpeed = xController.calculate(range, 5);
     }
-    drivetrain.drive(0, rotate);
+    drivetrain.drive(xSpeed, rotate);
   }
 
   // Called once the command ends or is interrupted.
