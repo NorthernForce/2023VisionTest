@@ -14,6 +14,9 @@ package frc.robot;
  */
 
 public final class Constants {
+    public static final double CAMERA_HEIGHT_METERS = 0.27;
+    public static final double TARGET_HEIGHT_METERS = 0.82;
+    public static final double CAMERA_PITCH_RADIANS = 0;
     //drive constants
     public static final int LEFT_PRIMARY_ID = 2;
     public static final int RIGHT_PRIMARY_ID = 1;
