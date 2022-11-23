@@ -13,6 +13,7 @@ import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import static frc.robot.Constants.CAMERA_PITCH_RADIANS;
 import static frc.robot.Constants.CAMERA_HEIGHT_METERS;
@@ -60,7 +61,7 @@ public class FollowTarget extends CommandBase {
     {
       double range = PhotonUtils.calculateDistanceToTargetMeters(
         CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, 
-        result.getBestTarget().getPitch());
+        Units.degreesToRadians(result.getBestTarget().getPitch()));
       rotate = controller.calculate(result.getBestTarget().getYaw(), 0);
       xSpeed = xController.calculate(range, distance);
     }
