@@ -8,6 +8,8 @@ import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.auto.FollowTarget;
 import frc.robot.commands.auto.TurnToTarget;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.TrackingSystem;
+import frc.robot.subsystems.TrackingSystem.TrackingType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
@@ -23,6 +25,8 @@ public class RobotContainer {
 
   private final OI oi = new OI();
   public static final Dashboard dashboard = new Dashboard();
+  public static final TrackingSystem trackingSystem = new TrackingSystem("webcam",
+    TrackingType.STATIC);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

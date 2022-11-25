@@ -9,13 +9,13 @@ import static frc.robot.RobotContainer.drivetrain;
 import java.util.function.DoubleSupplier;
 
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import static frc.robot.RobotContainer.dashboard;
+import static frc.robot.RobotContainer.trackingSystem;
 
 public class FollowTarget extends CommandBase {
   /** Creates a new TurnToTarget. */
@@ -24,7 +24,7 @@ public class FollowTarget extends CommandBase {
   private final double distance;
   private DoubleSupplier rotateP, rotateD, driveP, driveD;
   public FollowTarget(double distance) {
-    addRequirements(drivetrain);
+    addRequirements(drivetrain, trackingSystem);
     this.distance = distance;
   }
 
@@ -48,19 +48,18 @@ public class FollowTarget extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    PhotonPipelineResult result = camera.getLatestResult();
     double rotate = 0;
     double xSpeed = 0;
     controller.setP(rotateP.getAsDouble());
     xController.setP(driveP.getAsDouble());
     controller.setD(rotateD.getAsDouble());
     xController.setD(driveD.getAsDouble());
-    if (result.hasTargets())
+    if (trackingSystem.hasTargets())
     {
-      Transform3d translation = result.getBestTarget().getBestCameraToTarget();
+      Transform3d translation = trackingSystem.getTargetPose3d().minus(drivetrain.getPose3d());
       double range = Math.sqrt(Math.pow(translation.getX(), 2) + 
         Math.pow(translation.getY(), 2));
-      rotate = controller.calculate(result.getBestTarget().getYaw(), 0);
+      rotate = controller.calculate(Math.atan(translation.getY() / translation.getX()));
       xSpeed = xController.calculate(range, distance);
       dashboard.putNumber("Range", range);
     }

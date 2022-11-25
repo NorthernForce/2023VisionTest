@@ -12,8 +12,10 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import static frc.robot.RobotContainer.dashboard;
+import static frc.robot.RobotContainer.trackingSystem;
 
 public class TurnToTarget extends CommandBase {
   /** Creates a new TurnToTarget. */
@@ -45,7 +47,8 @@ public class TurnToTarget extends CommandBase {
     double rotate = 0;
     if (result.hasTargets())
     {
-      rotate = controller.calculate(result.getBestTarget().getYaw(), 0);
+      Transform3d translation = trackingSystem.getTargetPose3d().minus(drivetrain.getPose3d());
+      rotate = controller.calculate(Math.atan(translation.getY() / translation.getX()));
     }
     drivetrain.drive(0, rotate);
   }
