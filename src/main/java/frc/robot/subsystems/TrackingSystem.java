@@ -21,6 +21,23 @@ public class TrackingSystem extends SubsystemBase {
     DYNAMIC,
     NONE
   }
+  public enum CameraFilter
+  {
+    YELLOW_BALL,
+    APRILTAG;
+    public int getPipelineIndex()
+    {
+      switch (this)
+      {
+      case YELLOW_BALL:
+        return 0;
+      case APRILTAG:
+        return 1;
+      default:
+        return -1;
+      }
+    }
+  }
   public abstract class Target
   {
     public abstract void update();
@@ -80,9 +97,14 @@ public class TrackingSystem extends SubsystemBase {
   private final TrackingType type;
   private PhotonPipelineResult lastResult;
   /** Creates a new TrackingSystem. */
-  public TrackingSystem(String cameraName, TrackingType type) {
+  public TrackingSystem(String cameraName, TrackingType type, CameraFilter filter) {
     this.type = type;
-    camera = new PhotonCamera(cameraName);
+    this.camera = new PhotonCamera(cameraName);
+    camera.setPipelineIndex(filter.getPipelineIndex());
+  }
+  void setFilter(CameraFilter filter)
+  {
+    camera.setPipelineIndex(filter.getPipelineIndex());
   }
   @Override
   public void periodic() {

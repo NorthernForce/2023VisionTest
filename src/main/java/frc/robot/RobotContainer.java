@@ -9,9 +9,11 @@ import frc.robot.commands.auto.FollowTarget;
 import frc.robot.commands.auto.TurnToTarget;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.TrackingSystem;
+import frc.robot.subsystems.TrackingSystem.CameraFilter;
 import frc.robot.subsystems.TrackingSystem.TrackingType;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -22,18 +24,20 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public static final Drivetrain drivetrain = new Drivetrain();
+  SendableChooser<Command> autonomousChooser;
 
   private final OI oi = new OI();
-  public static final Dashboard dashboard = new Dashboard();
-  public static final TrackingSystem trackingSystem = new TrackingSystem("webcam",
-    TrackingType.STATIC);
+  public static final TrackingSystem trackingSystem = new TrackingSystem(Constants.CAMERA_ID,
+    TrackingType.STATIC, CameraFilter.APRILTAG);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     initDefaultCommands();
     oi.bindButtons();
-    dashboard.clearDashboard();
-    dashboard.displayCommands(new TurnToTarget(), new FollowTarget(4), new InstantCommand());
+    autonomousChooser = new SendableChooser<>();
+    autonomousChooser.addOption("Follow Target", new FollowTarget(5));
+    autonomousChooser.addOption("Turn To Target", new TurnToTarget());
+    SmartDashboard.putData("Autonomous Routine Chooser", autonomousChooser);
   }
 
   /**
@@ -43,7 +47,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return dashboard.getSelection();
+    return autonomousChooser.getSelected();
   }
 
   private void initDefaultCommands() {

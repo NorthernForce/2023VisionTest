@@ -6,15 +6,13 @@ package frc.robot.commands.auto;
 
 import static frc.robot.RobotContainer.drivetrain;
 
-import java.util.function.DoubleSupplier;
-
 import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import static frc.robot.RobotContainer.dashboard;
 import static frc.robot.RobotContainer.trackingSystem;
 
 public class FollowTarget extends CommandBase {
@@ -22,7 +20,6 @@ public class FollowTarget extends CommandBase {
   private PhotonCamera camera;
   private PIDController controller, xController;
   private final double distance;
-  private DoubleSupplier rotateP, rotateD, driveP, driveD;
   public FollowTarget(double distance) {
     addRequirements(drivetrain, trackingSystem);
     this.distance = distance;
@@ -35,14 +32,8 @@ public class FollowTarget extends CommandBase {
     camera.setPipelineIndex(1);
     controller = new PIDController(0.025, 0, 0);
     xController = new PIDController(0.07, 0, 0);
-    dashboard.putNumber("Rotate - kP", 0.025);
-    dashboard.putNumber("Rotate - kD", 0);
-    dashboard.putNumber("Drive - kP", 0.07);
-    dashboard.putNumber("Drive - kD", 0);
-    rotateP = dashboard.getSupplier("Rotate - kP");
-    rotateD = dashboard.getSupplier("Rotate - kD");
-    driveP = dashboard.getSupplier("Drive - kP");
-    driveD = dashboard.getSupplier("Drive - kD");
+    SmartDashboard.putData("Rotate Controller", controller);
+    SmartDashboard.putData("Drive Controller", xController);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -50,10 +41,6 @@ public class FollowTarget extends CommandBase {
   public void execute() {
     double rotate = 0;
     double xSpeed = 0;
-    controller.setP(rotateP.getAsDouble());
-    xController.setP(driveP.getAsDouble());
-    controller.setD(rotateD.getAsDouble());
-    xController.setD(driveD.getAsDouble());
     if (trackingSystem.hasTargets())
     {
       Transform3d translation = trackingSystem.getTargetPose3d().minus(drivetrain.getPose3d());
@@ -61,7 +48,7 @@ public class FollowTarget extends CommandBase {
         Math.pow(translation.getY(), 2));
       rotate = controller.calculate(Math.atan(translation.getY() / translation.getX()));
       xSpeed = xController.calculate(range, distance);
-      dashboard.putNumber("Range", range);
+      SmartDashboard.putNumber("Range", range);
     }
     drivetrain.drive(xSpeed, rotate);
   }
@@ -70,11 +57,11 @@ public class FollowTarget extends CommandBase {
   @Override
   public void end(boolean interrupted)
   {
-    dashboard.delete("Rotate - kP");
-    dashboard.delete("Rotate - kD");
-    dashboard.delete("Drive - kP");
-    dashboard.delete("Drive - kD");
-    dashboard.delete("Range");
+    SmartDashboard.delete("Rotate - kP");
+    SmartDashboard.delete("Rotate - kD");
+    SmartDashboard.delete("Drive - kP");
+    SmartDashboard.delete("Drive - kD");
+    SmartDashboard.delete("Range");
   }
 
   // Returns true when the command should end.
