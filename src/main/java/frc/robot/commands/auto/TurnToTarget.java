@@ -10,7 +10,6 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import static frc.robot.RobotContainer.trackingSystem;
@@ -39,8 +38,8 @@ public class TurnToTarget extends CommandBase {
     double rotate = 0;
     if (result.hasTargets())
     {
-      Transform3d translation = trackingSystem.getTargetPose3d().minus(drivetrain.getPose3d());
-      rotate = controller.calculate(Math.atan(translation.getY() / translation.getX()));
+      var target = trackingSystem.getTrackedTarget().getLastTarget();
+      rotate = controller.calculate(target.getYaw(), 0);
     }
     drivetrain.drive(0, rotate);
   }
@@ -48,8 +47,6 @@ public class TurnToTarget extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    SmartDashboard.delete("kP");
-    SmartDashboard.delete("kD");
   }
 
   // Returns true when the command should end.

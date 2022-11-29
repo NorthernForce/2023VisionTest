@@ -43,19 +43,27 @@ public class TrackingSystem extends SubsystemBase {
     public abstract void update();
     public abstract void update(PhotonTrackedTarget target);
     public abstract Pose3d getLastKnownPose();
+    public abstract PhotonTrackedTarget getLastTarget();
   }
   public class StaticTarget extends Target
   {
     private Pose3d lastKnownPose;
+    private PhotonTrackedTarget lastTarget;
     public StaticTarget(PhotonTrackedTarget target)
     {
       Transform3d cameraToTarget = target.getBestCameraToTarget();
       lastKnownPose = drivetrain.getPose3d().plus(cameraToTarget);
+      lastTarget = target;
     }
     @Override
     public Pose3d getLastKnownPose()
     {
       return lastKnownPose;
+    }
+    @Override
+    public PhotonTrackedTarget getLastTarget()
+    {
+      return lastTarget;
     }
     @Override
     public void update()
@@ -66,20 +74,28 @@ public class TrackingSystem extends SubsystemBase {
     {
       Transform3d cameraToTarget = target.getBestCameraToTarget();
       lastKnownPose = drivetrain.getPose3d().plus(cameraToTarget);
+      lastTarget = target;
     }
   };
   public class DynamicTarget extends Target
   {
     private Pose3d lastKnownPose;
+    private PhotonTrackedTarget lastTarget;
     public DynamicTarget(PhotonTrackedTarget target)
     {
       Transform3d cameraToTarget = target.getBestCameraToTarget();
       lastKnownPose = drivetrain.getPose3d().plus(cameraToTarget);
+      lastTarget = target;
     }
     @Override
     public Pose3d getLastKnownPose()
     {
       return lastKnownPose;
+    }
+    @Override
+    public PhotonTrackedTarget getLastTarget()
+    {
+      return lastTarget;
     }
     @Override
     public void update()
@@ -90,6 +106,7 @@ public class TrackingSystem extends SubsystemBase {
     {
       Transform3d cameraToTarget = target.getBestCameraToTarget();
       lastKnownPose = drivetrain.getPose3d().plus(cameraToTarget);
+      lastTarget = target;
     }
   };
   private final PhotonCamera camera;
@@ -140,7 +157,7 @@ public class TrackingSystem extends SubsystemBase {
   }
   public boolean hasTargets()
   {
-    return lastResult.hasTargets();
+    return trackedTarget != null;
   }
   public PhotonTrackedTarget getBestTarget()
   {

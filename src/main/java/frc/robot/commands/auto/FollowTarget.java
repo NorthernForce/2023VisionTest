@@ -7,11 +7,14 @@ package frc.robot.commands.auto;
 import static frc.robot.RobotContainer.drivetrain;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 
 import static frc.robot.RobotContainer.trackingSystem;
 
@@ -43,10 +46,14 @@ public class FollowTarget extends CommandBase {
     double xSpeed = 0;
     if (trackingSystem.hasTargets())
     {
-      Transform3d translation = trackingSystem.getTargetPose3d().minus(drivetrain.getPose3d());
-      double range = Math.sqrt(Math.pow(translation.getX(), 2) + 
-        Math.pow(translation.getY(), 2));
-      rotate = controller.calculate(Math.atan(translation.getY() / translation.getX()));
+      PhotonTrackedTarget target = trackingSystem.getTrackedTarget().getLastTarget();
+      double range = PhotonUtils.calculateDistanceToTargetMeters(
+        Constants.CAMERA_HEIGHT_METERS,
+        Constants.TARGET_HEIGHT_METERS,
+        Constants.CAMERA_PITCH_RADIANS,
+        Units.degreesToRadians(target.getPitch())
+      );
+      rotate = controller.calculate(target.getYaw(), 0);
       xSpeed = xController.calculate(range, distance);
       SmartDashboard.putNumber("Range", range);
     }
@@ -57,11 +64,6 @@ public class FollowTarget extends CommandBase {
   @Override
   public void end(boolean interrupted)
   {
-    SmartDashboard.delete("Rotate - kP");
-    SmartDashboard.delete("Rotate - kD");
-    SmartDashboard.delete("Drive - kP");
-    SmartDashboard.delete("Drive - kD");
-    SmartDashboard.delete("Range");
   }
 
   // Returns true when the command should end.
