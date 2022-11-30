@@ -52,7 +52,6 @@ public class TrackingSystem extends SubsystemBase {
     public StaticTarget(PhotonTrackedTarget target)
     {
       Transform3d cameraToTarget = target.getBestCameraToTarget();
-      lastKnownPose = drivetrain.getPose3d().plus(cameraToTarget);
       lastTarget = target;
     }
     @Override
@@ -73,7 +72,6 @@ public class TrackingSystem extends SubsystemBase {
     public void update(PhotonTrackedTarget target)
     {
       Transform3d cameraToTarget = target.getBestCameraToTarget();
-      lastKnownPose = drivetrain.getPose3d().plus(cameraToTarget);
       lastTarget = target;
     }
   };
@@ -84,7 +82,6 @@ public class TrackingSystem extends SubsystemBase {
     public DynamicTarget(PhotonTrackedTarget target)
     {
       Transform3d cameraToTarget = target.getBestCameraToTarget();
-      lastKnownPose = drivetrain.getPose3d().plus(cameraToTarget);
       lastTarget = target;
     }
     @Override
@@ -105,7 +102,6 @@ public class TrackingSystem extends SubsystemBase {
     public void update(PhotonTrackedTarget target)
     {
       Transform3d cameraToTarget = target.getBestCameraToTarget();
-      lastKnownPose = drivetrain.getPose3d().plus(cameraToTarget);
       lastTarget = target;
     }
   };
@@ -149,7 +145,7 @@ public class TrackingSystem extends SubsystemBase {
     }
     else
     {
-      if (type != TrackingType.NONE)
+      if (type != TrackingType.NONE && trackedTarget != null)
       {
         trackedTarget.update();
       }
@@ -166,17 +162,5 @@ public class TrackingSystem extends SubsystemBase {
   public Target getTrackedTarget()
   {
     return trackedTarget;
-  }
-  public Pose3d getTargetPose3d()
-  {
-    if (type != TrackingType.NONE)
-    {
-      return trackedTarget.getLastKnownPose();
-    }
-    if (lastResult.hasTargets())
-    {
-      return drivetrain.getPose3d().plus(lastResult.getBestTarget().getBestCameraToTarget());
-    }
-    return null;
   }
 }

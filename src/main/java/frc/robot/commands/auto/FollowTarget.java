@@ -8,6 +8,7 @@ import static frc.robot.RobotContainer.drivetrain;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -34,7 +35,8 @@ public class FollowTarget extends CommandBase {
     camera = new PhotonCamera("webcam");
     camera.setPipelineIndex(1);
     controller = new PIDController(0.025, 0, 0);
-    xController = new PIDController(0.07, 0, 0);
+    xController = new PIDController(0.1, 0.01, 0);
+    xController.setTolerance(0.1);
     SmartDashboard.putData("Rotate Controller", controller);
     SmartDashboard.putData("Drive Controller", xController);
   }
@@ -44,9 +46,10 @@ public class FollowTarget extends CommandBase {
   public void execute() {
     double rotate = 0;
     double xSpeed = 0;
-    if (trackingSystem.hasTargets())
+    PhotonPipelineResult result = camera.getLatestResult();
+    if (result.hasTargets())
     {
-      PhotonTrackedTarget target = trackingSystem.getTrackedTarget().getLastTarget();
+      PhotonTrackedTarget target = result.getBestTarget();
       double range = PhotonUtils.calculateDistanceToTargetMeters(
         Constants.CAMERA_HEIGHT_METERS,
         Constants.TARGET_HEIGHT_METERS,
@@ -54,8 +57,10 @@ public class FollowTarget extends CommandBase {
         Units.degreesToRadians(target.getPitch())
       );
       rotate = controller.calculate(target.getYaw(), 0);
-      xSpeed = xController.calculate(range, distance);
+      xSpeed = -xController.calculate(range, distance);
+      SmartDashboard.putNumber("speed", xSpeed);
       SmartDashboard.putNumber("Range", range);
+      SmartDashboard.putNumber("distane", distance);
     }
     drivetrain.drive(xSpeed, rotate);
   }

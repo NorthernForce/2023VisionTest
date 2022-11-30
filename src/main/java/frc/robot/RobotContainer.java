@@ -35,7 +35,7 @@ public class RobotContainer {
     initDefaultCommands();
     oi.bindButtons();
     autonomousChooser = new SendableChooser<>();
-    autonomousChooser.addOption("Follow Target", new FollowTarget(5));
+    autonomousChooser.addOption("Follow Target", new FollowTarget(2));
     autonomousChooser.addOption("Turn To Target", new TurnToTarget());
     SmartDashboard.putData("Autonomous Routine Chooser", autonomousChooser);
   }

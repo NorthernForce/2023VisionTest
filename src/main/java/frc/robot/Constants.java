@@ -16,8 +16,8 @@ package frc.robot;
 public final class Constants {
     // Targeting constants
     public static final String CAMERA_ID = "webcam";
-    public static final double CAMERA_HEIGHT_METERS = 0.27;
-    public static final double TARGET_HEIGHT_METERS = 0.82;
+    public static final double CAMERA_HEIGHT_METERS = 0.22;
+    public static final double TARGET_HEIGHT_METERS = 0.77;
     public static final double CAMERA_PITCH_RADIANS = 0;
     //drive constants
     public static final int LEFT_PRIMARY_ID = 2;

@@ -27,13 +27,24 @@ public class TurnToTarget extends CommandBase {
   public void initialize() {
     camera = new PhotonCamera("webcam");
     camera.setPipelineIndex(1);
-    controller = new PIDController(0.025, 0, 0);
-    SmartDashboard.putData("Turn Contoller", controller);
+    SmartDashboard.putNumber("turnController - kP", 0.025);
+    SmartDashboard.putNumber("turnController - kI", 0);
+    SmartDashboard.putNumber("turnController - kD", 0);
+    double kp = SmartDashboard.getNumber("turnController - kP", 0.025);
+    double ki = SmartDashboard.getNumber("turnController - kI", 0);
+    double kd = SmartDashboard.getNumber("turnController - kD", 0);
+    controller = new PIDController(kp, ki, kd);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double kp = SmartDashboard.getNumber("turnController - kP", 0);
+    double ki = SmartDashboard.getNumber("turnController - kI", 0);
+    double kd = SmartDashboard.getNumber("turnController - kD", 0);
+    controller.setP(kp);
+    controller.setI(ki);
+    controller.setD(kd);
     PhotonPipelineResult result = camera.getLatestResult();
     double rotate = 0;
     if (result.hasTargets())

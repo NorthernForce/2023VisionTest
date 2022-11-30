@@ -28,8 +28,6 @@ public class Drivetrain extends SubsystemBase {
   private final WPI_TalonFX rightFollower;
 
   private final DifferentialDrive robotDrive;
-  private final DifferentialDriveOdometry odometry;
-  private Gyro gyro; // TODO: Implement this
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
@@ -43,16 +41,6 @@ public class Drivetrain extends SubsystemBase {
     configureAllControllers();
 
     robotDrive = new DifferentialDrive(leftPrimary, rightPrimary);
-    odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
-  }
-  public Pose2d getPose2d()
-  {
-    return odometry.getPoseMeters();
-  }
-  public Pose3d getPose3d()
-  {
-    return new Pose3d(odometry.getPoseMeters().getX(), odometry.getPoseMeters().getY(),
-      CAMERA_HEIGHT_METERS, new Rotation3d(0, CAMERA_PITCH_RADIANS, gyro.getAngle()));
   }
   public void drive(double speed, double rotation) {
     robotDrive.arcadeDrive(speed * SPEED_PROPORTION, rotation * ROTATION_SPEED_PROPORTION);
