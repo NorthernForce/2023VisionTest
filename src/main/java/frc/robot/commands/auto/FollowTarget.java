@@ -6,23 +6,15 @@ package frc.robot.commands.auto;
 
 import static frc.robot.RobotContainer.drivetrain;
 
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 
 import static frc.robot.RobotContainer.trackingSystem;
 
 public class FollowTarget extends CommandBase {
   /** Creates a new TurnToTarget. */
-  private PhotonCamera camera;
-  private PIDController controller, xController;
+  private PIDController forwardController, turnController;
   private final double distance;
   public FollowTarget(double distance) {
     addRequirements(drivetrain, trackingSystem);
@@ -32,35 +24,27 @@ public class FollowTarget extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    camera = new PhotonCamera("webcam");
-    camera.setPipelineIndex(1);
-    controller = new PIDController(0.025, 0, 0);
-    xController = new PIDController(0.1, 0.01, 0);
-    xController.setTolerance(0.1);
-    SmartDashboard.putData("Rotate Controller", controller);
-    SmartDashboard.putData("Drive Controller", xController);
+    turnController = new PIDController(0.025, 0, 0);
+    forwardController = new PIDController(0.1, 0.01, 0);
+    forwardController.setTolerance(0.1);
+    SmartDashboard.putData("Forward Controller", forwardController);
+    SmartDashboard.putData("Turn Controller", turnController);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    forwardController = (PIDController)SmartDashboard.getData("Forward Controller");
+    turnController = (PIDController)SmartDashboard.getData("Turn Controller");
     double rotate = 0;
     double xSpeed = 0;
-    PhotonPipelineResult result = camera.getLatestResult();
-    if (result.hasTargets())
+    if (trackingSystem.hasTargets())
     {
-      PhotonTrackedTarget target = result.getBestTarget();
-      double range = PhotonUtils.calculateDistanceToTargetMeters(
-        Constants.CAMERA_HEIGHT_METERS,
-        Constants.TARGET_HEIGHT_METERS,
-        Constants.CAMERA_PITCH_RADIANS,
-        Units.degreesToRadians(target.getPitch())
-      );
-      rotate = controller.calculate(target.getYaw(), 0);
-      xSpeed = -xController.calculate(range, distance);
-      SmartDashboard.putNumber("speed", xSpeed);
+      double range = trackingSystem.estimateRangeMeters();
+      rotate = turnController.calculate(trackingSystem.getTargetYawDegrees(), 0);
+      xSpeed = -forwardController.calculate(range, distance);
+      SmartDashboard.putNumber("Forward speed", xSpeed);
       SmartDashboard.putNumber("Range", range);
-      SmartDashboard.putNumber("distane", distance);
     }
     drivetrain.drive(xSpeed, rotate);
   }

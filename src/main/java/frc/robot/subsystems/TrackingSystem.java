@@ -8,19 +8,10 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static frc.robot.RobotContainer.drivetrain;
-
 public class TrackingSystem extends SubsystemBase {
-  public enum TrackingType
-  {
-    STATIC,
-    DYNAMIC,
-    NONE
-  }
   public enum CameraFilter
   {
     YELLOW_BALL,
@@ -38,81 +29,11 @@ public class TrackingSystem extends SubsystemBase {
       }
     }
   }
-  public abstract class Target
-  {
-    public abstract void update();
-    public abstract void update(PhotonTrackedTarget target);
-    public abstract Pose3d getLastKnownPose();
-    public abstract PhotonTrackedTarget getLastTarget();
-  }
-  public class StaticTarget extends Target
-  {
-    private Pose3d lastKnownPose;
-    private PhotonTrackedTarget lastTarget;
-    public StaticTarget(PhotonTrackedTarget target)
-    {
-      Transform3d cameraToTarget = target.getBestCameraToTarget();
-      lastTarget = target;
-    }
-    @Override
-    public Pose3d getLastKnownPose()
-    {
-      return lastKnownPose;
-    }
-    @Override
-    public PhotonTrackedTarget getLastTarget()
-    {
-      return lastTarget;
-    }
-    @Override
-    public void update()
-    {
-    }
-    @Override
-    public void update(PhotonTrackedTarget target)
-    {
-      Transform3d cameraToTarget = target.getBestCameraToTarget();
-      lastTarget = target;
-    }
-  };
-  public class DynamicTarget extends Target
-  {
-    private Pose3d lastKnownPose;
-    private PhotonTrackedTarget lastTarget;
-    public DynamicTarget(PhotonTrackedTarget target)
-    {
-      Transform3d cameraToTarget = target.getBestCameraToTarget();
-      lastTarget = target;
-    }
-    @Override
-    public Pose3d getLastKnownPose()
-    {
-      return lastKnownPose;
-    }
-    @Override
-    public PhotonTrackedTarget getLastTarget()
-    {
-      return lastTarget;
-    }
-    @Override
-    public void update()
-    {
-    }
-    @Override
-    public void update(PhotonTrackedTarget target)
-    {
-      Transform3d cameraToTarget = target.getBestCameraToTarget();
-      lastTarget = target;
-    }
-  };
   private final PhotonCamera camera;
-  private Target trackedTarget = null;
-  private final TrackingType type;
   private PhotonPipelineResult lastResult;
   /** Creates a new TrackingSystem. */
-  public TrackingSystem(String cameraName, TrackingType type, CameraFilter filter) {
-    this.type = type;
-    this.camera = new PhotonCamera(cameraName);
+  public TrackingSystem(String cameraName, CameraFilter filter) {
+    camera = new PhotonCamera(cameraName);
     camera.setPipelineIndex(filter.getPipelineIndex());
   }
   void setFilter(CameraFilter filter)
@@ -122,45 +43,32 @@ public class TrackingSystem extends SubsystemBase {
   @Override
   public void periodic() {
     lastResult = camera.getLatestResult();
-    if (lastResult.hasTargets())
-    {
-      if (type != TrackingType.NONE)
-      {
-        if (trackedTarget == null)
-        {
-          if (type == TrackingType.DYNAMIC)
-          {
-            trackedTarget = new DynamicTarget(lastResult.getBestTarget());
-          }
-          else if (type == TrackingType.STATIC)
-          {
-            trackedTarget = new StaticTarget(lastResult.getBestTarget());
-          }
-        }
-        else
-        {
-          trackedTarget.update(lastResult.getBestTarget());
-        }
-      }
-    }
-    else
-    {
-      if (type != TrackingType.NONE && trackedTarget != null)
-      {
-        trackedTarget.update();
-      }
-    }
   }
   public boolean hasTargets()
   {
-    return trackedTarget != null;
+    return lastResult != null && lastResult.hasTargets();
   }
   public PhotonTrackedTarget getBestTarget()
   {
+    if (lastResult == null) return null;
     return lastResult.getBestTarget();
   }
-  public Target getTrackedTarget()
+  public double getTargetYawDegrees()
   {
-    return trackedTarget;
+    assert hasTargets();
+    return getBestTarget().getYaw();
+  }
+  /* REQUIRES 3D CALIBRATION! */
+  public Transform3d getTransformToTarget()
+  {
+    assert hasTargets();
+    return lastResult.getBestTarget().getBestCameraToTarget();
+  }
+  /* Pythagorean theorem: REQUIRES 3D CALIBRATION! */
+  public double estimateRangeMeters()
+  {
+    Transform3d targetTransform = getTransformToTarget();
+    double x = targetTransform.getX(), y = targetTransform.getY();
+    return Math.sqrt(x * x + y * y);
   }
 }

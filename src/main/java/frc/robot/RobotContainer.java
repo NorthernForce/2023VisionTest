@@ -10,7 +10,6 @@ import frc.robot.commands.auto.TurnToTarget;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.TrackingSystem;
 import frc.robot.subsystems.TrackingSystem.CameraFilter;
-import frc.robot.subsystems.TrackingSystem.TrackingType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,7 +27,7 @@ public class RobotContainer {
 
   private final OI oi = new OI();
   public static final TrackingSystem trackingSystem = new TrackingSystem(Constants.CAMERA_ID,
-    TrackingType.STATIC, CameraFilter.APRILTAG);
+   CameraFilter.APRILTAG);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
