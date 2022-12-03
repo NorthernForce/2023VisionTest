@@ -24,9 +24,10 @@ public class FollowTarget extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    turnController = new PIDController(0.025, 0, 0);
-    forwardController = new PIDController(0.1, 0.01, 0);
+    turnController = new PIDController(0.012, 0, 0);
+    forwardController = new PIDController(0.4, 0.2, 0);
     forwardController.setTolerance(0.1);
+    turnController.setTolerance(0.1);
     SmartDashboard.putData("Forward Controller", forwardController);
     SmartDashboard.putData("Turn Controller", turnController);
   }
