@@ -17,17 +17,24 @@ public class TurnToTarget extends CommandBase {
   public TurnToTarget() {
     addRequirements(drivetrain);
   }
-
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    controller = new PIDController(0.025, 0, 0);
-    SmartDashboard.putData("Turn Controller", controller);
+    double turnP = SmartDashboard.getNumber("Turn Controller - kP", 0.12);
+    double turnI = SmartDashboard.getNumber("Turn Controller - kI", 0);
+    double turnD = SmartDashboard.getNumber("Turn Controller - kD", 0);
+    controller = new PIDController(turnP, turnI, turnD);
+    controller.setTolerance(0.1);
+    SmartDashboard.putNumber("Turn Controller - kP", turnP);
+    SmartDashboard.putNumber("Turn Controller - kI", turnI);
+    SmartDashboard.putNumber("Turn Controller - kD", turnD);
   }
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    controller = (PIDController)SmartDashboard.getData("Turn Controller");
+    controller.setP(SmartDashboard.getNumber("Turn Controller - kP", 0.12));
+    controller.setI(SmartDashboard.getNumber("Turn Controller - kP", 0));
+    controller.setD(SmartDashboard.getNumber("Turn Controller - kP", 0));
     double rotate = 0;
     if (trackingSystem.hasTargets())
     {
@@ -36,12 +43,10 @@ public class TurnToTarget extends CommandBase {
     }
     drivetrain.drive(0, rotate);
   }
-
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
   }
-
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {

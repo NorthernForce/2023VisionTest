@@ -24,19 +24,33 @@ public class FollowTarget extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    turnController = new PIDController(0.012, 0, 0);
-    forwardController = new PIDController(0.4, 0.2, 0);
+    double forwardP = SmartDashboard.getNumber("Forward Controller - kP", 0.2);
+    double turnP = SmartDashboard.getNumber("Turn Controller - kP", 0.12);
+    double forwardI = SmartDashboard.getNumber("Forward Controller - kI", 0.2);
+    double turnI = SmartDashboard.getNumber("Turn Controller - kI", 0);
+    double forwardD = SmartDashboard.getNumber("Forward Controller - kD", 0);
+    double turnD = SmartDashboard.getNumber("Turn Controller - kD", 0);
+    turnController = new PIDController(turnP, turnI, turnD);
+    forwardController = new PIDController(forwardP, forwardI, forwardD);
     forwardController.setTolerance(0.1);
     turnController.setTolerance(0.1);
-    SmartDashboard.putData("Forward Controller", forwardController);
-    SmartDashboard.putData("Turn Controller", turnController);
+    SmartDashboard.putNumber("Forward Controller - kP", forwardP);
+    SmartDashboard.putNumber("Turn Controller - kP", turnP);
+    SmartDashboard.putNumber("Forward Controller - kI", forwardI);
+    SmartDashboard.putNumber("Turn Controller - kI", turnI);
+    SmartDashboard.putNumber("Forward Controller - kD", forwardD);
+    SmartDashboard.putNumber("Turn Controller - kD", turnD);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    forwardController = (PIDController)SmartDashboard.getData("Forward Controller");
-    turnController = (PIDController)SmartDashboard.getData("Turn Controller");
+    forwardController.setP(SmartDashboard.getNumber("Forward Controller - kP", 0.2));
+    turnController.setP(SmartDashboard.getNumber("Turn Controller - kP", 0.12));
+    forwardController.setI(SmartDashboard.getNumber("Forward Controller - kP", 0.2));
+    turnController.setI(SmartDashboard.getNumber("Turn Controller - kP", 0));
+    forwardController.setD(SmartDashboard.getNumber("Forward Controller - kP", 0));
+    turnController.setD(SmartDashboard.getNumber("Turn Controller - kP", 0));
     double rotate = 0;
     double xSpeed = 0;
     if (trackingSystem.hasTargets())
@@ -49,13 +63,11 @@ public class FollowTarget extends CommandBase {
     }
     drivetrain.drive(xSpeed, rotate);
   }
-
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
   }
-
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
