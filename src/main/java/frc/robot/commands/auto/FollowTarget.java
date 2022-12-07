@@ -31,9 +31,10 @@ public class FollowTarget extends CommandBase {
     double forwardD = SmartDashboard.getNumber("Forward Controller - kD", 0);
     double turnD = SmartDashboard.getNumber("Turn Controller - kD", 0);
     turnController = new PIDController(turnP, turnI, turnD);
+    turnController.setSetpoint(0);
     forwardController = new PIDController(forwardP, forwardI, forwardD);
-    forwardController.setTolerance(0.1);
-    turnController.setTolerance(0.1);
+    forwardController.setTolerance(0.2);
+    forwardController.setSetpoint(distance);
     SmartDashboard.putNumber("Forward Controller - kP", forwardP);
     SmartDashboard.putNumber("Turn Controller - kP", turnP);
     SmartDashboard.putNumber("Forward Controller - kI", forwardI);
@@ -47,17 +48,17 @@ public class FollowTarget extends CommandBase {
   public void execute() {
     forwardController.setP(SmartDashboard.getNumber("Forward Controller - kP", 0.2));
     turnController.setP(SmartDashboard.getNumber("Turn Controller - kP", 0.12));
-    forwardController.setI(SmartDashboard.getNumber("Forward Controller - kP", 0.2));
-    turnController.setI(SmartDashboard.getNumber("Turn Controller - kP", 0));
-    forwardController.setD(SmartDashboard.getNumber("Forward Controller - kP", 0));
-    turnController.setD(SmartDashboard.getNumber("Turn Controller - kP", 0));
+    forwardController.setI(SmartDashboard.getNumber("Forward Controller - kI", 0.2));
+    turnController.setI(SmartDashboard.getNumber("Turn Controller - kI", 0));
+    forwardController.setD(SmartDashboard.getNumber("Forward Controller - kD", 0));
+    turnController.setD(SmartDashboard.getNumber("Turn Controller - kD", 0));
     double rotate = 0;
     double xSpeed = 0;
     if (trackingSystem.hasTargets())
     {
       double range = trackingSystem.estimateRangeMeters();
-      rotate = turnController.calculate(trackingSystem.getTargetYawDegrees(), 0);
-      xSpeed = -forwardController.calculate(range, distance);
+      if (Math.abs(trackingSystem.getTargetYawDegrees()) >= 1) rotate = turnController.calculate(trackingSystem.getTargetYawDegrees());
+      if (Math.abs(range - distance) >= 0.2) xSpeed = -forwardController.calculate(range);
       SmartDashboard.putNumber("Forward speed", xSpeed);
       SmartDashboard.putNumber("Range", range);
     }

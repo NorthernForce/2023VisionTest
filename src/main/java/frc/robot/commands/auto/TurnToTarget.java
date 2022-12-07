@@ -24,7 +24,7 @@ public class TurnToTarget extends CommandBase {
     double turnI = SmartDashboard.getNumber("Turn Controller - kI", 0);
     double turnD = SmartDashboard.getNumber("Turn Controller - kD", 0);
     controller = new PIDController(turnP, turnI, turnD);
-    controller.setTolerance(0.1);
+    controller.setTolerance(1);
     SmartDashboard.putNumber("Turn Controller - kP", turnP);
     SmartDashboard.putNumber("Turn Controller - kI", turnI);
     SmartDashboard.putNumber("Turn Controller - kD", turnD);
@@ -33,8 +33,8 @@ public class TurnToTarget extends CommandBase {
   @Override
   public void execute() {
     controller.setP(SmartDashboard.getNumber("Turn Controller - kP", 0.12));
-    controller.setI(SmartDashboard.getNumber("Turn Controller - kP", 0));
-    controller.setD(SmartDashboard.getNumber("Turn Controller - kP", 0));
+    controller.setI(SmartDashboard.getNumber("Turn Controller - kI", 0));
+    controller.setD(SmartDashboard.getNumber("Turn Controller - kD", 0));
     double rotate = 0;
     if (trackingSystem.hasTargets())
     {
