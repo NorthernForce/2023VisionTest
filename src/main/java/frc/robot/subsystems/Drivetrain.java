@@ -24,13 +24,14 @@ public class Drivetrain extends SubsystemBase {
 
   private final DifferentialDrive robotDrive;
 
-  /** Creates a new Drivetrain. */
+  /**
+   * Constructs a drivetrain
+   */
   public Drivetrain() {
     leftPrimary = new WPI_TalonFX(LEFT_PRIMARY_ID);
     rightPrimary = new WPI_TalonFX(RIGHT_PRIMARY_ID);
     leftFollower = new WPI_TalonFX(LEFT_FOLLOWER_ID);
     rightFollower = new WPI_TalonFX(RIGHT_FOLLOWER_ID);
-
     setFollowers();
     setInvert();
     configureAllControllers();
@@ -89,12 +90,7 @@ public class Drivetrain extends SubsystemBase {
     TalonFXConfiguration configs = new TalonFXConfiguration();
     configs.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor;
     controller.configAllSettings(configs);
-    
-
-
-
-}
-
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

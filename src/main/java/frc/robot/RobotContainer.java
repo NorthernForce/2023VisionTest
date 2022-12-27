@@ -5,14 +5,17 @@
 package frc.robot;
 
 import frc.robot.commands.DriveWithJoystick;
+import frc.robot.commands.auto.FindTarget;
 import frc.robot.commands.auto.FollowTarget;
 import frc.robot.commands.auto.TurnToTarget;
+import frc.robot.subsystems.CameraMount;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.TrackingSystem;
 import frc.robot.subsystems.TrackingSystem.CameraFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -23,19 +26,23 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public static final Drivetrain drivetrain = new Drivetrain();
-  SendableChooser<Command> autonomousChooser;
+  public static final CameraMount cameraMount = new CameraMount();
+  public static final TrackingSystem trackingSystem = new TrackingSystem(Constants.CAMERA_ID,
+    CameraFilter.APRILTAG);
+  
+  private final SendableChooser<Command> autonomousChooser;
 
   private final OI oi = new OI();
-  public static final TrackingSystem trackingSystem = new TrackingSystem(Constants.CAMERA_ID,
-   CameraFilter.APRILTAG);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     initDefaultCommands();
     oi.bindButtons();
     autonomousChooser = new SendableChooser<>();
+    autonomousChooser.addOption("Instant Command (Do nothing)", new InstantCommand());
     autonomousChooser.addOption("Follow Target", new FollowTarget(2));
     autonomousChooser.addOption("Turn To Target", new TurnToTarget());
+    autonomousChooser.addOption("Find Target", new FindTarget(0.2));
     SmartDashboard.putData("Autonomous Routine Chooser", autonomousChooser);
   }
 

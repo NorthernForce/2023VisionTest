@@ -4,13 +4,20 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+// TODO: Calibrate/TEST
+/**
+ * Camera Mount Subsystem
+ */
 public class CameraMount extends SubsystemBase {
+  /** z-axis servo */
   private final Servo zAxisRotate = new Servo(0);
+  /** y-axis servo */
   private final Servo yAxisRotate = new Servo(1);
-  /** Creates a new CameraMount. */
+  /** Creates a camera mount */
   public CameraMount() {
   }
   /**
@@ -44,6 +51,30 @@ public class CameraMount extends SubsystemBase {
   public void setYAxisRotate(double rotate)
   {
     yAxisRotate.setAngle(rotate);
+  }
+  /**
+   * sets camera mount y-axis speed
+   * @param speed the speed of the camera (between -1.0 and 1.0)
+   */
+  public void setYAxisSpeed(double speed)
+  {
+    yAxisRotate.setSpeed(speed);
+  }
+  /**
+   * sets camera mount z-axis speed
+   * @param speed the speed of the camera (between -1.0 and 1.0)
+   */
+  public void setZAxisSpeed(double speed)
+  {
+    zAxisRotate.setSpeed(speed);
+  }
+  /**
+   * gets the camera rotation
+   * @return a Rotation3d object
+   */
+  public Rotation3d getRotation3d()
+  {
+    return new Rotation3d(0, getYAxisRotate(), getZAxisRotate());
   }
   @Override
   public void periodic() {

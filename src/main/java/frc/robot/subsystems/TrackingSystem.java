@@ -9,7 +9,10 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static frc.robot.RobotContainer.cameraMount;
 
 public class TrackingSystem extends SubsystemBase {
   public enum CameraFilter
@@ -53,18 +56,43 @@ public class TrackingSystem extends SubsystemBase {
     if (lastResult == null) return null;
     return lastResult.getBestTarget();
   }
+  /**
+   * Gets the current yaw of the target to camera.
+   * REQUIRES 3D CALIBRATION.
+   * @return degree value of yaw
+   */
   public double getTargetYawDegrees()
   {
     assert hasTargets();
-    return getBestTarget().getYaw();
+    return Math.toDegrees(getTransformToTarget().getZ());
   }
-  /* REQUIRES 3D CALIBRATION! */
+  /**
+   * Gets the current pitch of the target to camera.
+   * REQUIRES 3D CALIBRATION
+   * @return degree value of pitch
+   */
+  public double getTargetPitchDegrees()
+  {
+    assert hasTargets();
+    return Math.toDegrees(getTransformToTarget().getRotation().getY());
+  }
+  /**
+   * Gets the current transform of the target to camera.
+   * REQUIRES 3D CALIBRATION
+   * @return Transform3d of robot to target
+   */
   public Transform3d getTransformToTarget()
   {
     assert hasTargets();
-    return lastResult.getBestTarget().getBestCameraToTarget();
+    Transform3d transform = lastResult.getBestTarget().getBestCameraToTarget();
+    return transform.plus(new Transform3d(new Translation3d(0, 0, 0),
+      cameraMount.getRotation3d()));
   }
-  /* Pythagorean theorem: REQUIRES 3D CALIBRATION! */
+  /**
+   * Gets the current distance from the target to camera.
+   * REQUIRES 3D CALIBRATION
+   * @return range of target in meters
+   */
   public double estimateRangeMeters()
   {
     Transform3d targetTransform = getTransformToTarget();
