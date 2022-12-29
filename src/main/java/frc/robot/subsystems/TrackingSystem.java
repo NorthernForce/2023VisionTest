@@ -64,8 +64,8 @@ public class TrackingSystem extends SubsystemBase {
   public void periodic() {
     lastResult = camera.getLatestResult();
     robotPoseEstimator.update(drivetrain.getHeading(),
-      drivetrain.getWheelSpeeds(), drivetrain.getEncoderRotations()[0], getTargetPitchDegrees());
-    if (hasTargets() && currentFilter == CameraFilter.APRILTAG)
+      drivetrain.getWheelSpeeds(), drivetrain.getEncoderRotations()[0], drivetrain.getEncoderRotations()[1]);
+    if (lastResult.hasTargets() && currentFilter == CameraFilter.APRILTAG)
     {
       double latency = Timer.getFPGATimestamp() - lastResult.getLatencyMillis();
       Transform2d transform = new Transform2d(new Translation2d(getTransformToTarget().getX(),
@@ -111,6 +111,8 @@ public class TrackingSystem extends SubsystemBase {
   public Transform3d getTransformToTarget()
   {
     assert hasTargets();
+    if (!hasTargets()) return null;
+    System.out.println(lastResult.getBestTarget());
     Transform3d transform = lastResult.getBestTarget().getBestCameraToTarget();
     return transform.plus(new Transform3d(new Translation3d(0, 0, 0),
       cameraMount.getRotation3d()));

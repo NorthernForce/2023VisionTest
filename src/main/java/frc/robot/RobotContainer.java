@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.auto.FindTarget;
 import frc.robot.commands.auto.FollowTarget;
+import frc.robot.commands.auto.TrackTarget;
 import frc.robot.commands.auto.TurnToTarget;
 import frc.robot.subsystems.CameraMount;
 import frc.robot.subsystems.Drivetrain;
@@ -43,6 +44,7 @@ public class RobotContainer {
     autonomousChooser.addOption("Follow Target", new FollowTarget(2));
     autonomousChooser.addOption("Turn To Target", new TurnToTarget());
     autonomousChooser.addOption("Find Target", new FindTarget(1));
+    autonomousChooser.addOption("Track Target", new TrackTarget());
     SmartDashboard.putData("Autonomous Routine Chooser", autonomousChooser);
   }
 
@@ -58,5 +60,6 @@ public class RobotContainer {
 
   private void initDefaultCommands() {
     drivetrain.setDefaultCommand(new DriveWithJoystick());
+    cameraMount.setDefaultCommand(new TrackTarget());
   }
 }

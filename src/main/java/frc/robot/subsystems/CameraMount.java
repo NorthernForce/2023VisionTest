@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // TODO: Calibrate/TEST
@@ -14,11 +15,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 public class CameraMount extends SubsystemBase {
   /** z-axis servo */
-  private final Servo zAxisRotate = new Servo(0);
+  private final Servo zAxisRotate = new Servo(9);
   /** y-axis servo */
-  private final Servo yAxisRotate = new Servo(1);
+  private final Servo yAxisRotate = new Servo(8);
   /** Creates a camera mount */
   public CameraMount() {
+    SmartDashboard.putNumber("Y Axis Rotate", getYAxisRotateDegrees());
+    SmartDashboard.putNumber("Z Axis Rotate", getZAxisRotateDegrees());
   }
   /**
    * Gets the rotate value of the z-axis servo.
@@ -26,7 +29,7 @@ public class CameraMount extends SubsystemBase {
    */
   public double getZAxisRotateDegrees()
   {
-    return zAxisRotate.getAngle();
+    return zAxisRotate.getAngle() - 90;
   }
   /**
    * Gets the rotate value of the y-axis servo.
@@ -34,7 +37,7 @@ public class CameraMount extends SubsystemBase {
    */
   public double getYAxisRotateDegrees()
   {
-    return yAxisRotate.getAngle();
+    return yAxisRotate.getAngle() - 90;
   }
   /**
    * sets camera mount z-axis angle
@@ -42,7 +45,7 @@ public class CameraMount extends SubsystemBase {
    */
   public void setZAxisRotateDegrees(double rotate)
   {
-    zAxisRotate.setAngle(rotate);
+    zAxisRotate.setAngle(rotate + 90);
   }
   /**
    * sets camera mount y-axis angle
@@ -50,7 +53,7 @@ public class CameraMount extends SubsystemBase {
    */
   public void setYAxisRotateDegrees(double rotate)
   {
-    yAxisRotate.setAngle(rotate);
+    yAxisRotate.setAngle(rotate + 90);
   }
   /**
    * sets camera mount y-axis speed
