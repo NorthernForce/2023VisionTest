@@ -24,7 +24,7 @@ public class CameraMount extends SubsystemBase {
    * Gets the rotate value of the z-axis servo.
    * @return z-axis rotate in degrees
    */
-  public double getZAxisRotate()
+  public double getZAxisRotateDegrees()
   {
     return zAxisRotate.getAngle();
   }
@@ -32,7 +32,7 @@ public class CameraMount extends SubsystemBase {
    * Gets the rotate value of the y-axis servo.
    * @return y-axis rotate in degrees
    */
-  public double getYAxisRotate()
+  public double getYAxisRotateDegrees()
   {
     return yAxisRotate.getAngle();
   }
@@ -40,7 +40,7 @@ public class CameraMount extends SubsystemBase {
    * sets camera mount z-axis angle
    * @param rotate the degree value for the new angle
    */
-  public void setZAxisRotate(double rotate)
+  public void setZAxisRotateDegrees(double rotate)
   {
     zAxisRotate.setAngle(rotate);
   }
@@ -48,7 +48,7 @@ public class CameraMount extends SubsystemBase {
    * sets camera mount y-axis angle
    * @param rotate the degree value for the new angle
    */
-  public void setYAxisRotate(double rotate)
+  public void setYAxisRotateDegrees(double rotate)
   {
     yAxisRotate.setAngle(rotate);
   }
@@ -74,7 +74,8 @@ public class CameraMount extends SubsystemBase {
    */
   public Rotation3d getRotation3d()
   {
-    return new Rotation3d(0, getYAxisRotate(), getZAxisRotate());
+    return new Rotation3d(0, Math.toRadians(getYAxisRotateDegrees()),
+      Math.toRadians(getZAxisRotateDegrees()));
   }
   @Override
   public void periodic() {

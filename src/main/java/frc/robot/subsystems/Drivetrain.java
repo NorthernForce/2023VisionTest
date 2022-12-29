@@ -6,13 +6,18 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+
 import static frc.robot.Constants.*;
 
 public class Drivetrain extends SubsystemBase {
@@ -23,6 +28,7 @@ public class Drivetrain extends SubsystemBase {
   private final WPI_TalonFX rightFollower;
 
   private final DifferentialDrive robotDrive;
+  private final AHRS gyro;
 
   /**
    * Constructs a drivetrain
@@ -35,8 +41,8 @@ public class Drivetrain extends SubsystemBase {
     setFollowers();
     setInvert();
     configureAllControllers();
-
     robotDrive = new DifferentialDrive(leftPrimary, rightPrimary);
+    gyro = new AHRS();
   }
   public void drive(double speed, double rotation) {
     robotDrive.arcadeDrive(speed * SPEED_PROPORTION, rotation * ROTATION_SPEED_PROPORTION);
@@ -50,6 +56,23 @@ public class Drivetrain extends SubsystemBase {
     double leftSideRotations = (leftPrimary.getSensorCollection().getIntegratedSensorPosition() * -1) / 2048;
     double rightSideRotations = rightPrimary.getSensorCollection().getIntegratedSensorPosition() / 2048;
     return new double[] {leftSideRotations, rightSideRotations};
+  }
+  
+  public double getLeftEncoderDistance()
+  {
+    double leftRotations = (leftPrimary.getSensorCollection().getIntegratedSensorPosition() * -1) / 2048;
+    return leftRotations * Constants.distancePerRevolution;
+  }
+
+  public double getRightEncoderDistance()
+  {
+    double rightRotations = (rightPrimary.getSensorCollection().getIntegratedSensorPosition()) / 2048;
+    return rightRotations * Constants.distancePerRevolution;
+  }
+
+  public DifferentialDriveWheelSpeeds getWheelSpeeds()
+  {
+    return new DifferentialDriveWheelSpeeds(leftPrimary.get(), rightPrimary.get());
   }
 
   private void setFollowers() {
@@ -90,6 +113,14 @@ public class Drivetrain extends SubsystemBase {
     TalonFXConfiguration configs = new TalonFXConfiguration();
     configs.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor;
     controller.configAllSettings(configs);
+  }
+  /**
+   * Returns the NavX's estimation of the robot heading
+   * @return heading in degrees
+   */
+  public Rotation2d getHeading()
+  {
+    return gyro.getRotation2d();
   }
   @Override
   public void periodic() {

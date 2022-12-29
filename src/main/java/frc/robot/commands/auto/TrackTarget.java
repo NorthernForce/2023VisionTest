@@ -6,14 +6,12 @@ package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import static frc.robot.RobotContainer.cameraMount;
 import static frc.robot.RobotContainer.trackingSystem;
+import static frc.robot.RobotContainer.cameraMount;
 
-public class FindTarget extends CommandBase {
-  private double speed;
-  /** Creates a new TurnCamera. */
-  public FindTarget(double speed) {
-    this.speed = speed;
+public class TrackTarget extends CommandBase {
+  /** Creates a new TrackTarget. */
+  public TrackTarget() {
     addRequirements(cameraMount, trackingSystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -21,28 +19,25 @@ public class FindTarget extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    cameraMount.setYAxisRotateDegrees(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (cameraMount.getZAxisRotateDegrees() > 250 || cameraMount.getZAxisRotateDegrees() < 20)
+    if (trackingSystem.hasTargets())
     {
-      speed = -speed;
+      cameraMount.setYAxisRotateDegrees(trackingSystem.getTargetPitchDegrees());
+      cameraMount.setZAxisRotateDegrees(trackingSystem.getTargetYawDegrees());
     }
-    cameraMount.setZAxisSpeed(speed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    cameraMount.setZAxisSpeed(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return trackingSystem.hasTargets();
+    return false;
   }
 }

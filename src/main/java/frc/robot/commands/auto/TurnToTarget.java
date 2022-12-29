@@ -41,8 +41,8 @@ public class TurnToTarget extends CommandBase {
     {
       double rotation = trackingSystem.getTargetYawDegrees();
       rotate = controller.calculate(rotation, 0);
-      cameraMount.setZAxisRotate(trackingSystem.getTargetYawDegrees());
-      cameraMount.setYAxisRotate(trackingSystem.getTargetPitchDegrees());
+      cameraMount.setZAxisRotateDegrees(trackingSystem.getTargetYawDegrees());
+      cameraMount.setYAxisRotateDegrees(trackingSystem.getTargetPitchDegrees());
     }
     drivetrain.drive(0, rotate);
   }

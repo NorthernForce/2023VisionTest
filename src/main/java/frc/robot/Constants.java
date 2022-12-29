@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -28,4 +31,8 @@ public final class Constants {
     public static final double SPEED_PROPORTION = 1;
 
     public static final int kUnitsPerRevolution = 2048;
+    public static final double wheelDiameter = 0.05;
+    public static final double distancePerRevolution = (wheelDiameter * Math.PI);
+
+    public static final Pose2d targetPose = new Pose2d(5, 0, Rotation2d.fromDegrees(0));
 }

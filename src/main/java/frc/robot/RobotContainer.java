@@ -42,7 +42,7 @@ public class RobotContainer {
     autonomousChooser.addOption("Instant Command (Do nothing)", new InstantCommand());
     autonomousChooser.addOption("Follow Target", new FollowTarget(2));
     autonomousChooser.addOption("Turn To Target", new TurnToTarget());
-    autonomousChooser.addOption("Find Target", new FindTarget(0.2));
+    autonomousChooser.addOption("Find Target", new FindTarget(1));
     SmartDashboard.putData("Autonomous Routine Chooser", autonomousChooser);
   }
 
