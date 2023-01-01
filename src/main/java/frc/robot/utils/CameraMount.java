@@ -1,27 +1,21 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-package frc.robot.subsystems;
+package frc.robot.utils;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // TODO: Calibrate/TEST
 /**
- * Camera Mount Subsystem
+ * Camera Mount
  */
-public class CameraMount extends SubsystemBase {
+public class CameraMount {
   /** z-axis servo */
-  private final Servo zAxisRotate = new Servo(9);
+  private final Servo zAxisRotate;
   /** y-axis servo */
-  private final Servo yAxisRotate = new Servo(8);
+  private final Servo yAxisRotate;
   /** Creates a camera mount */
-  public CameraMount() {
-    SmartDashboard.putNumber("Y Axis Rotate", getYAxisRotateDegrees());
-    SmartDashboard.putNumber("Z Axis Rotate", getZAxisRotateDegrees());
+  public CameraMount(int yAxis, int zAxis) {
+    yAxisRotate = new Servo(yAxis);
+    zAxisRotate = new Servo(zAxis);
   }
   /**
    * Gets the rotate value of the z-axis servo.
@@ -79,8 +73,5 @@ public class CameraMount extends SubsystemBase {
   {
     return new Rotation3d(0, Math.toRadians(getYAxisRotateDegrees()),
       Math.toRadians(getZAxisRotateDegrees()));
-  }
-  @Override
-  public void periodic() {
   }
 }

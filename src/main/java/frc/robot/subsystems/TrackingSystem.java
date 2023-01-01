@@ -8,71 +8,23 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-
-import static frc.robot.RobotContainer.cameraMount;
-import static frc.robot.RobotContainer.drivetrain;
+import frc.robot.utils.CameraMount;
 
 public class TrackingSystem extends SubsystemBase {
-  public enum CameraFilter
-  {
-    YELLOW_BALL,
-    APRILTAG;
-    public int getPipelineIndex()
-    {
-      switch (this)
-      {
-      case YELLOW_BALL:
-        return 0;
-      case APRILTAG:
-        return 1;
-      default:
-        return -1;
-      }
-    }
-  }
   private final PhotonCamera camera;
   private PhotonPipelineResult lastResult;
-  private CameraFilter currentFilter;
-  private final DifferentialDrivePoseEstimator robotPoseEstimator;
+  private final CameraMount cameraMount;
   /** Creates a new TrackingSystem. */
-  public TrackingSystem(String cameraName, CameraFilter filter) {
-    camera = new PhotonCamera(cameraName);
-    camera.setPipelineIndex((currentFilter = filter).getPipelineIndex());
-    robotPoseEstimator = new DifferentialDrivePoseEstimator(drivetrain.getHeading(),
-      new Pose2d(),
-      new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.02, 0.02, 0.01, 0.02, 0.02),
-      new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01),
-      new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01));
-  }
-  void setFilter(CameraFilter filter)
-  {
-    camera.setPipelineIndex((currentFilter = filter).getPipelineIndex());
+  public TrackingSystem(PhotonCamera camera, CameraMount mount) {
+    this.camera = camera;
+    cameraMount = mount;
   }
   @Override
   public void periodic() {
-    lastResult = camera.getLatestResult();
-    robotPoseEstimator.update(drivetrain.getHeading(),
-      drivetrain.getWheelSpeeds(), drivetrain.getEncoderRotations()[0], drivetrain.getEncoderRotations()[1]);
-    if (lastResult.hasTargets() && currentFilter == CameraFilter.APRILTAG)
-    {
-      double latency = Timer.getFPGATimestamp() - lastResult.getLatencyMillis();
-      Transform2d transform = new Transform2d(new Translation2d(getTransformToTarget().getX(),
-        getTransformToTarget().getZ()), new Rotation2d(getTransformToTarget().getRotation().getZ()));
-      Pose2d currentPose = Constants.targetPose.transformBy(transform.inverse());
-      robotPoseEstimator.addVisionMeasurement(currentPose, latency);
-    }
+    if (camera != null) lastResult = camera.getLatestResult();
   }
   public boolean hasTargets()
   {
@@ -82,6 +34,14 @@ public class TrackingSystem extends SubsystemBase {
   {
     if (lastResult == null) return null;
     return lastResult.getBestTarget();
+  }
+  public void enableAutonomousMode()
+  {
+    if (camera != null) camera.setDriverMode(false);
+  }
+  public void enableDriverMode()
+  {
+    if (camera != null) camera.setDriverMode(true);
   }
   /**
    * Gets the current yaw of the target to camera.
@@ -114,7 +74,7 @@ public class TrackingSystem extends SubsystemBase {
     if (!hasTargets()) return null;
     System.out.println(lastResult.getBestTarget());
     Transform3d transform = lastResult.getBestTarget().getBestCameraToTarget();
-    return transform.plus(new Transform3d(new Translation3d(0, 0, 0),
+    return cameraMount == null ? transform : transform.plus(new Transform3d(new Translation3d(0, 0, 0),
       cameraMount.getRotation3d()));
   }
   /**
@@ -127,13 +87,5 @@ public class TrackingSystem extends SubsystemBase {
     Transform3d targetTransform = getTransformToTarget();
     double x = targetTransform.getX(), y = targetTransform.getY();
     return Math.sqrt(x * x + y * y);
-  }
-  /**
-   * Gets the odometry's current pose in meters
-   * @return pose in meters
-   */
-  public Pose2d getCurrentPose2d()
-  {
-    return robotPoseEstimator.getEstimatedPosition();
   }
 }

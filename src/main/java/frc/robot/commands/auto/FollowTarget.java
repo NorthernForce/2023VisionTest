@@ -5,13 +5,11 @@
 package frc.robot.commands.auto;
 
 import static frc.robot.RobotContainer.drivetrain;
+import static frc.robot.RobotContainer.trackingSystem;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
-import static frc.robot.RobotContainer.trackingSystem;
-import static frc.robot.RobotContainer.cameraMount;
 
 public class FollowTarget extends CommandBase {
   /** Creates a new TurnToTarget. */
@@ -61,8 +59,6 @@ public class FollowTarget extends CommandBase {
       if (Math.abs(trackingSystem.getTargetYawDegrees()) >= 1)
         rotate = turnController.calculate(trackingSystem.getTargetYawDegrees());
       if (Math.abs(range - distance) >= 0.2) xSpeed = -forwardController.calculate(range);
-      cameraMount.setZAxisRotateDegrees(trackingSystem.getTargetYawDegrees());
-      cameraMount.setYAxisRotateDegrees(trackingSystem.getTargetPitchDegrees());
       SmartDashboard.putNumber("Forward speed", xSpeed);
       SmartDashboard.putNumber("Range", range);
     }

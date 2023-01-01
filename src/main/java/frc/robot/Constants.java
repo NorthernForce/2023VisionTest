@@ -34,5 +34,7 @@ public final class Constants {
     public static final double wheelDiameter = 0.05;
     public static final double distancePerRevolution = (wheelDiameter * Math.PI);
 
-    public static final Pose2d targetPose = new Pose2d(5, 0, Rotation2d.fromDegrees(0));
+    public static final Pose2d[] targetPoses = {
+        new Pose2d(5, 0, Rotation2d.fromDegrees(90))
+    };
 }

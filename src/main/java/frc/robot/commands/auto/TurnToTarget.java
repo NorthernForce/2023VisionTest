@@ -5,18 +5,17 @@
 package frc.robot.commands.auto;
 
 import static frc.robot.RobotContainer.drivetrain;
+import static frc.robot.RobotContainer.trackingSystem;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import static frc.robot.RobotContainer.trackingSystem;
-import static frc.robot.RobotContainer.cameraMount;
 
 public class TurnToTarget extends CommandBase {
   /** Creates a new TurnToTarget. */
   private PIDController controller;
   public TurnToTarget() {
-    addRequirements(drivetrain, trackingSystem, cameraMount);
+    addRequirements(drivetrain, trackingSystem);
   }
   // Called when the command is initially scheduled.
   @Override
@@ -41,8 +40,6 @@ public class TurnToTarget extends CommandBase {
     {
       double rotation = trackingSystem.getTargetYawDegrees();
       rotate = controller.calculate(rotation, 0);
-      cameraMount.setZAxisRotateDegrees(trackingSystem.getTargetYawDegrees());
-      cameraMount.setYAxisRotateDegrees(trackingSystem.getTargetPitchDegrees());
     }
     drivetrain.drive(0, rotate);
   }

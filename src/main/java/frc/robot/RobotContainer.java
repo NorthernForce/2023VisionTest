@@ -5,14 +5,15 @@
 package frc.robot;
 
 import frc.robot.commands.DriveWithJoystick;
-import frc.robot.commands.auto.FindTarget;
 import frc.robot.commands.auto.FollowTarget;
-import frc.robot.commands.auto.TrackTarget;
 import frc.robot.commands.auto.TurnToTarget;
-import frc.robot.subsystems.CameraMount;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.PositioningSystem;
 import frc.robot.subsystems.TrackingSystem;
-import frc.robot.subsystems.TrackingSystem.CameraFilter;
+import frc.robot.utils.CameraMount;
+
+import org.photonvision.PhotonCamera;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,27 +28,24 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public static final Drivetrain drivetrain = new Drivetrain();
-  public static final CameraMount cameraMount = new CameraMount();
-  public static final TrackingSystem trackingSystem = new TrackingSystem(Constants.CAMERA_ID,
-    CameraFilter.APRILTAG);
-  
+  private static final PhotonCamera camera1 = new PhotonCamera(Constants.CAMERA_ID);
+  public static final TrackingSystem trackingSystem = new TrackingSystem(camera1, new CameraMount(0, 1));
+  public static final PositioningSystem positioningSystem = new PositioningSystem(null, null);
   private final SendableChooser<Command> autonomousChooser;
 
   private final OI oi = new OI();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    camera1.setPipelineIndex(1);
     initDefaultCommands();
     oi.bindButtons();
     autonomousChooser = new SendableChooser<>();
     autonomousChooser.addOption("Instant Command (Do nothing)", new InstantCommand());
     autonomousChooser.addOption("Follow Target", new FollowTarget(2));
     autonomousChooser.addOption("Turn To Target", new TurnToTarget());
-    autonomousChooser.addOption("Find Target", new FindTarget(1));
-    autonomousChooser.addOption("Track Target", new TrackTarget());
     SmartDashboard.putData("Autonomous Routine Chooser", autonomousChooser);
   }
-
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -60,6 +58,5 @@ public class RobotContainer {
 
   private void initDefaultCommands() {
     drivetrain.setDefaultCommand(new DriveWithJoystick());
-    cameraMount.setDefaultCommand(new TrackTarget());
   }
 }
