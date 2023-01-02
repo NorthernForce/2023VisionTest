@@ -11,20 +11,30 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utils.CameraMount;
 
 public class TrackingSystem extends SubsystemBase {
   private final PhotonCamera camera;
   private PhotonPipelineResult lastResult;
   private final CameraMount cameraMount;
+  private final boolean trackUsingCamera;
   /** Creates a new TrackingSystem. */
-  public TrackingSystem(PhotonCamera camera, CameraMount mount) {
+  public TrackingSystem(PhotonCamera camera, CameraMount mount, boolean trackUsingCamera) {
+    this.trackUsingCamera = trackUsingCamera;
     this.camera = camera;
     cameraMount = mount;
   }
   @Override
   public void periodic() {
-    if (camera != null) lastResult = camera.getLatestResult();
+
+    if (camera != null)
+    {
+      lastResult = camera.getLatestResult();
+      if (lastResult.hasTargets() && trackUsingCamera)
+      {
+        cameraMount.setYAxisRotateDegrees(getTargetYawDegrees());
+        cameraMount.setZAxisRotateDegrees(getTargetPitchDegrees());
+      }
+    }
   }
   public boolean hasTargets()
   {

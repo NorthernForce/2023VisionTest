@@ -7,10 +7,10 @@ package frc.robot;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.auto.FollowTarget;
 import frc.robot.commands.auto.TurnToTarget;
+import frc.robot.subsystems.CameraMount;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.PositioningSystem;
 import frc.robot.subsystems.TrackingSystem;
-import frc.robot.utils.CameraMount;
 
 import org.photonvision.PhotonCamera;
 
@@ -29,8 +29,9 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public static final Drivetrain drivetrain = new Drivetrain();
   private static final PhotonCamera camera1 = new PhotonCamera(Constants.CAMERA_ID);
-  public static final TrackingSystem trackingSystem = new TrackingSystem(camera1, new CameraMount(0, 1));
-  public static final PositioningSystem positioningSystem = new PositioningSystem(null, null);
+  private static final CameraMount cameraMount1 = new CameraMount(0, 1);
+  public static final TrackingSystem trackingSystem = new TrackingSystem(camera1, cameraMount1, true);
+  public static final PositioningSystem positioningSystem = new PositioningSystem(null, null, false);
   private final SendableChooser<Command> autonomousChooser;
 
   private final OI oi = new OI();

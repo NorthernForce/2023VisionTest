@@ -1,4 +1,4 @@
-package frc.robot.utils;
+package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.Servo;

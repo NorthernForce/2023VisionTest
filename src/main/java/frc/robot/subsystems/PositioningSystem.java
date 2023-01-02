@@ -9,8 +9,6 @@ import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,10 +16,11 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.utils.CameraMount;
 
 import static frc.robot.RobotContainer.drivetrain;
 
@@ -30,15 +29,15 @@ public class PositioningSystem extends SubsystemBase {
   private final AHRS ahrs = new AHRS();
   private final PhotonCamera camera;
   private final CameraMount mount;
+  private final boolean trackUsingCamera;
   /** Creates a new PositioningSystem. */
-  public PositioningSystem(PhotonCamera camera, CameraMount mount) {
+  public PositioningSystem(PhotonCamera camera, CameraMount mount, boolean trackUsingCamera) {
+    this.trackUsingCamera = trackUsingCamera;
     this.camera = camera;
     ahrs.reset();
     ahrs.calibrate();
-    robotPoseEstimator = new DifferentialDrivePoseEstimator(ahrs.getRotation2d(), new Pose2d(),
-      new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.02, 0.02, 0.01, 0.02, 0.02),
-      new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01),
-      new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01));
+    robotPoseEstimator = new DifferentialDrivePoseEstimator(new DifferentialDriveKinematics(Units.inchesToMeters(12)),
+      ahrs.getRotation2d(), drivetrain.getLeftEncoderDistance(), drivetrain.getRightEncoderDistance(), new Pose2d());
     this.mount = mount;
   }
   public Pose2d getRobotPose()
@@ -58,7 +57,7 @@ public class PositioningSystem extends SubsystemBase {
     if (camera != null && !camera.getDriverMode())
     {
       PhotonPipelineResult result = camera.getLatestResult();
-      robotPoseEstimator.update(ahrs.getRotation2d(), drivetrain.getWheelSpeeds(), drivetrain.getLeftEncoderDistance(),
+      robotPoseEstimator.update(ahrs.getRotation2d(), drivetrain.getLeftEncoderDistance(),
         drivetrain.getRightEncoderDistance());
       if (result.hasTargets())
       {
@@ -70,6 +69,11 @@ public class PositioningSystem extends SubsystemBase {
           new Rotation2d(cameraToTarget.getRotation().getZ()));
         Pose2d targetPose = Constants.targetPoses[result.getBestTarget().getFiducialId()];
         robotPoseEstimator.addVisionMeasurement(targetPose.transformBy(transform2d.inverse()), imageCaptureTime);
+        if (trackUsingCamera)
+        {
+          mount.setYAxisRotateDegrees(Math.toDegrees(cameraToTarget.getRotation().getY()));
+          mount.setYAxisRotateDegrees(Math.toDegrees(cameraToTarget.getRotation().getZ()));
+        }
       }
     }
   }
