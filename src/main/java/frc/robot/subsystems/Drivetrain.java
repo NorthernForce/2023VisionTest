@@ -6,12 +6,14 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
 
@@ -21,6 +23,7 @@ public class Drivetrain extends SubsystemBase {
   private final WPI_TalonFX rightPrimary;
   private final WPI_TalonFX leftFollower;
   private final WPI_TalonFX rightFollower;
+  public final AHRS imu = new AHRS();
 
   private final DifferentialDrive robotDrive;
 
@@ -34,6 +37,8 @@ public class Drivetrain extends SubsystemBase {
     setFollowers();
     setInvert();
     configureAllControllers();
+
+    imu.reset();
 
     robotDrive = new DifferentialDrive(leftPrimary, rightPrimary);
   }
@@ -98,6 +103,10 @@ public class Drivetrain extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Pitch: ", imu.getPitch());
+    SmartDashboard.putNumber("Yaw: ", imu.getYaw());
+    SmartDashboard.putNumber("Roll: ", imu.getRoll());
+    SmartDashboard.putData("IMU: ", imu);
     // This method will be called once per scheduler run
   }
 }

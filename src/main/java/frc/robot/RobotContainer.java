@@ -4,8 +4,11 @@
 
 package frc.robot;
 
+import frc.robot.commands.CalibrateIMU;
 import frc.robot.commands.DriveWithJoystick;
+import frc.robot.commands.auto.PIDBalance;
 import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
@@ -25,6 +28,8 @@ public class RobotContainer {
   public RobotContainer() {
     initDefaultCommands();
     oi.bindButtons();
+    SmartDashboard.putData("Auto Balance", new PIDBalance());
+    SmartDashboard.putData("Calibrate", new CalibrateIMU());
   }
 
   /**
